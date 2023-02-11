@@ -130,6 +130,20 @@ function App() {
             }}
           </SidebarHeader>
           <DateHeader unit="primaryHeader" />
+          <DateHeader
+            style={{ height: 50 }}
+            intervalRenderer={({ getIntervalProps, intervalContext }) => {
+              return (
+                <div
+                  {...getIntervalProps({
+                    style: {}
+                  })}
+                >
+                  {intervalContext.intervalText}
+                </div>
+              );
+            }}
+          />
         </TimelineHeaders>
       </Timeline>
 
