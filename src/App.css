@@ -1,10 +1,111 @@
+@import "./items.css";
+
 .sticky {
   position: sticky;
   top: 0;
   z-index: 2000;
 }
 
-.react-calendar-timeline .rct-dateHeader-primary{
-  color: black !important;
+.dataheader {
+  background-color: #EAEAEA !important;
+  border-left: 1px solid #C4C4C4;
+  border-bottom: none;
 }
 
+.sidebarHeader {
+  border-right: 1px solid #bbb;
+  color:#515C6F;
+  background-color: #EAEAEA;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dataheader .rct-dateHeader {
+  background-color: #EAEAEA;
+  border-left: 1px solid #C4C4C4;
+  border: none;
+}
+
+.custom-group {
+  background-color: #FFFFFF;
+  border-bottom: none;
+}
+
+.react-calendar-timeline .rct-calendar-header {
+  border: none !important;
+  color:#515C6F;
+}
+
+.react-calendar-timeline .rct-calendar-header .rct-dateHeader-primary {
+  border: none !important;
+  background-color: #EAEAEA;
+  color:#515C6F;
+}
+
+.property {
+  background-color: #f3f1f1;
+  cursor: pointer;
+}
+
+.room {
+  display: flex;
+}
+
+.room-mark {
+  width: 6px;
+  height: auto;
+  background-color: #F69322;
+  margin-right: 15px;
+}
+
+.react-calendar-timeline .rct-header-root {
+  background-color: #cac7c7;
+  border-left: 1px solid #C4C4C4;
+  border-bottom: none;
+}
+
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even, .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+  border-bottom: none;
+}
+
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
+  background-color: #F3F5F7;
+}
+
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+  background-color: #F3F5F7;
+}
+
+.react-calendar-timeline .rct-sidebar .rct-sidebar-row {
+  padding: 0px !important;
+  border-bottom: none;
+}
+
+.react-calendar-timeline .rct-header .rct-label {
+  border-bottom: none
+}
+
+.react-calendar-timeline .rct-vertical-lines .rct-vl.rct-vl-first {
+  border-color: #ccc;
+}
+
+.react-calendar-timeline .rct-vertical-lines .rct-vl {
+  border-left: 1px solid #EAEAEA;
+}
+
+.react-calendar-timeline .rct-header .rct-label-group {
+  font-family: 'Work Sans', sans-serif;
+  background: #eee;
+  color: #000;
+  font-size: 1rem;
+}
+
+.react-calendar-timeline .rct-sidebar-header {
+  background: #eee;
+  color: #000;
+  text-align: center;
+  padding-top: 1rem;
+  border: none;
+  border-right: solid 2px #ccc !important;
+}
