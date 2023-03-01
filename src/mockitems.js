@@ -2,36 +2,23 @@ import moment from 'moment'
 
 var mockitems =  [
     {
-      id: 0,
-      group: 1,
-      title: 'Guest 1',
-      start_time: moment(),
-      end_time: moment().add(2, 'day'),
-      color: 'rgb(158, 14, 206)',
-      selectedBgColor: 'black',
-      bgColor : 'white',
+      id: "HMHCFF9BCQ",
+      area: "Uluwatu",
+      unit_name: "Uluwatu Kayana Bungalows - 4",
+      booking_status: 1,
+      guest_name: "Karim Zeidan",
+      guest_status: "Ask guest arrival time",
+      check_in_date: moment("2023-02-24"),
+      check_out_date: moment("2023-03-05"),
+      arrival_time: "No info",
+      profile_ota: "Ryan & Jing",
+      host: "Bisma Toriq Kuncoro Aji",
+      communication: "",
+      conversation_url: "https://www.airbnb.com/hosting/thread/1395315815",
+      total_comment: 0,
+      total_altered: null,
+      group: 1001
     },
-    {
-      id: 1,
-      group: 1,
-      title: 'Guest 2',
-      start_time: moment().add(6, 'day'),
-      end_time: moment().add(12, 'day')
-    },
-    {
-      id: 2,
-      group: 2,
-      title: 'Guest 3',
-      start_time: moment().add(2, 'day'),
-      end_time: moment().add(8, 'day')
-    },
-    {
-      id: 3,
-      group: 2,
-      title: 'Guest 4',
-      start_time: moment().subtract(5, 'day'),
-      end_time: moment()
-    }
   ]
 
 export default mockitems;

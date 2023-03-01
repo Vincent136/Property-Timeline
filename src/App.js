@@ -13,9 +13,8 @@ import moment from 'moment'
 import Modal from 'react-modal';
 import MoveDialog from './MoveDialog';
 import DetailDialog from './DetailDialog';
+import HoldDialog from './HoldDialog';
 
-import mockitems from './mockitems';
-import mockgroups from './mockgroups';
 import apiGroups from './apiGroups';
 
 import "./App.css"
@@ -35,7 +34,7 @@ Modal.setAppElement('#root');
 
 
 function App() {
-  const [items, setItems] = useState(mockitems);
+  const [items, setItems] = useState([]);
   const [roomGroups, setRoomGroups] = useState([]);
   const [propertyGroups, setPropertyGroups] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -44,25 +43,24 @@ function App() {
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
+  const [holdOpen, setHoldOpen] = useState(false);
 
-  const handleCanvasDoubleClick = (groupId, time) => {
-    
+  const handleCanvasClick = (groupId, time) => {
+    setHoldOpen(true);
 
     console.log('Canvas double clicked', groupId, moment(time).format())
   }
 
   const handleItemDoubleClick = (itemId, _, time) => {
-    setClickedItems(items.filter(item => item.id === itemId))
-
-    openDetail();
+    setClickedItems(items.filter(item => item.id === itemId)[0])
 
     console.log('Double Click: ' + itemId, moment(time).format())
   }
 
   const handleItemMove = (itemId, dragTime, newGroupOrder) => {
-
+   
     function moveItem(item) {
-      var diff = (item.end_time - item.start_time)
+      var diff = (item.check_out_date - item.check_in_date)
 
       const startTime = moment(dragTime)
       startTime.set({h: 12, m: 0, s: 0, ms: 0})
@@ -70,9 +68,9 @@ function App() {
       const endTime = moment(dragTime + diff)
       endTime.set({h: 12, m: 0, s: 0, ms: 0})
 
-      item.group = newGroupOrder
-      item.start_time =  startTime
-      item.end_time = endTime
+      item.group = groups[newGroupOrder].id
+      item.check_in_date =  startTime
+      item.check_out_date = endTime
     }
 
     let newitems = [...items]
@@ -94,26 +92,26 @@ function App() {
     
 
     function setSize(item) {
-      console.log(item.start_time.toDate())
+      console.log(item.check_in_date.toDate())
       // console.log(newTime.toDate())
       if ( edge === 'left') {
         time = moment(time)
         time.set({h: 14, m: 0, s: 0, ms: 0})
         const monthTime = moment(time).format('MMM')
         const dayTime = moment(time).format('DD')
-        const itemStartDate = item.start_time.format('DD')
-        const itemStartMonth = item.start_time.toDate('MMM')
+        const itemStartDate = item.check_in_date.format('DD')
+        const itemStartMonth = item.check_in_date.toDate('MMM')
 
-        if ((itemStartDate !== monthTime) && (itemStartMonth !== dayTime)) item.start_time = time;
+        if ((itemStartDate !== monthTime) && (itemStartMonth !== dayTime)) item.check_in_date = time;
       }else {
         time = moment(time)
         time.set({h: 12, m: 0, s: 0, ms: 0})
 
         const monthTime = moment(time).format('MMM')
         const dayTime = moment(time).format('DD')
-        const itemEndDate = item.end_time.format('DD')
-        const itemEndMonth = item.end_time.toDate('MMM')
-        if ((itemEndDate !== monthTime) && (itemEndMonth !== dayTime)) item.end_time = time;
+        const itemEndDate = item.check_out_date.format('DD')
+        const itemEndMonth = item.check_out_date.toDate('MMM')
+        if ((itemEndDate !== monthTime) && (itemEndMonth !== dayTime)) item.check_out_date = time;
       }
     }
 
@@ -138,6 +136,7 @@ function App() {
 
   const closeDetail = () => {
     setDetailOpen(false);
+    setClickedItems({});
   }
 
   const openMove = () => {
@@ -148,6 +147,14 @@ function App() {
   const closeMove = () => {
     setMoveOpen(false);
   };
+
+  const openHold = () => {
+    setHoldOpen(true);
+  }
+
+  const closeHold = () => {
+    setHoldOpen(false);
+  }
 
   const groupRenderer = ({ group }) => {
     if (group.type === 'Property') {
@@ -201,18 +208,18 @@ function App() {
 
     const propertyGroups = []
     const roomGroups = []
+    const item = []
 
-    let dictId = {
+    let dictPropertyId = {
 
     }
     let id = 1
 
     for (const key in apiGroups.data)
     {
-
-      apiGroups.data[key].map(unit => {
+      apiGroups.data[key].forEach(unit => {
           const split_name = unit.unit_name.split("-")
-          if (!dictId[split_name[0]]) {
+          if (!dictPropertyId[split_name[0]]) {
             propertyGroups.push({
               id: id,
               type: 'Property',
@@ -220,25 +227,50 @@ function App() {
               height: 45
             })
 
-            dictId[split_name[0]] = id
+            dictPropertyId[split_name[0]] = 
+            {
+              id : id,
+              lastId: id,
+              room : {
+
+              }
+            }
           } 
 
-          roomGroups.push({
-            id: id+1000,
-            type: "Room",
-            title: split_name[1],
-            propertyId: dictId[split_name[0]],
-            height: 45
-          })
-          id =  id + 1
+          if (dictPropertyId[split_name[0]] && !dictPropertyId[split_name[0]].room[split_name[1]]) {
+            dictPropertyId[split_name[0]].lastId += 1
+            roomGroups.push({
+              id: dictPropertyId[split_name[0]].lastId,
+              type: "Room",
+              title: split_name[1],
+              propertyId: dictPropertyId[split_name[0]].id,
+              height: 45
+            })
 
+            dictPropertyId[split_name[0]].room[split_name[1]] = dictPropertyId[split_name[0]].lastId
+          }
+          id =  id + 50
           
+          const pushUnit = unit
+          pushUnit.group = dictPropertyId[split_name[0]].room[split_name[1]]
+          pushUnit.check_in_date = moment(unit.check_in_date)
+          pushUnit.check_out_date = moment(unit.check_out_date)
+          item.push(
+            pushUnit
+          )
       })
     }
 
+    setItems(item)
     setRoomGroups(roomGroups)
     setPropertyGroups(propertyGroups)
   }, []);
+
+  useEffect(()=> {
+    if (JSON.stringify(clickedItems) !== '{}') {
+      openDetail();
+    }
+  }, [clickedItems])
 
   useEffect(() => {
     const newGroups = []
@@ -257,42 +289,58 @@ function App() {
   setGroups(newGroups)
   }, [groupOpened, propertyGroups, roomGroups]);
 
+  const key = {
+    groupIdKey: 'id',
+    groupTitleKey: 'title',
+    groupRightTitleKey: 'rightTitle',
+    itemIdKey: 'id',
+    itemTitleKey: 'guest_name',    
+    itemDivTitleKey: 'guest_name', 
+    itemGroupKey: 'group',
+    itemTimeStartKey: 'check_in_date',
+    itemTimeEndKey: 'check_out_date',
+  }
+
   return (
     <div className="App">
       <h1>page</h1>
+      {items &&
       <Timeline
-        groups={groups}
-        items={items}
-        defaultTimeStart={moment().add(-15, 'day')}
-        defaultTimeEnd={moment().add(15, 'day')}
-        onCanvasDoubleClick={handleCanvasDoubleClick}
-        onItemDoubleClick={handleItemDoubleClick}
-        onItemMove={handleItemMove}
-        onItemResize={handleItemResize}
-        minZoom={604800000}
-        groupRenderer={groupRenderer}
-        itemRenderer={itemRender}
-      >
-        <TimelineHeaders>
-            <SidebarHeader>
-          {({ getRootProps }) => {
-            return <div className='sidebarHeader' {...getRootProps()}>Units</div>
-          }}
-        </SidebarHeader>
-        <DateHeader unit='primaryHeader' />
-        <DateHeader className='dataheader' />
-        </TimelineHeaders>
-      <TimelineMarkers>
-        <TodayMarker />
-        <CursorMarker />
-      </TimelineMarkers>
-      </Timeline>
+      groups={groups}
+      items={items}
+      keys={key}
+      sidebarWidth="250"
+      // rightSidebarWidth="0"
+      defaultTimeStart={moment().add(-15, 'day')}
+      defaultTimeEnd={moment().add(15, 'day')}
+      onCanvasClick={handleCanvasClick}
+      onItemDoubleClick={handleItemDoubleClick}
+      onItemMove={handleItemMove}
+      onItemResize={handleItemResize}
+      minZoom={604800000}
+      groupRenderer={groupRenderer}
+      itemRenderer={itemRender}
+    >
+      <TimelineHeaders>
+          <SidebarHeader>
+        {({ getRootProps }) => {
+          return <div className='sidebarHeader' {...getRootProps()}>Units</div>
+        }}
+      </SidebarHeader>
+      <DateHeader unit='primaryHeader' />
+      <DateHeader className='dataheader' />
+      </TimelineHeaders>
+    <TimelineMarkers>
+      <TodayMarker />
+      <CursorMarker />
+    </TimelineMarkers>
+    </Timeline>
 
+      }
 
       <MoveDialog open={moveOpen} closeDialog={closeMove}/>
-      <DetailDialog open={detailOpen} closeDialog={closeDetail}/>
-
-      
+      <DetailDialog open={detailOpen} closeDialog={closeDetail} items={clickedItems}/>
+      <HoldDialog open={holdOpen} closeDialog={closeHold}/>
     </div>
   );
 }
